@@ -1,10 +1,10 @@
 package com.malik.aieffectapp.data
 
 import android.net.Uri
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.functions.ktx.functions
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.auth.auth
+import com.google.firebase.functions.functions
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import com.malik.aieffectapp.Config
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
@@ -72,7 +72,7 @@ object AiRepository {
     /** Writes an AI-content report (Play policy: every AI output needs a flag button). */
     suspend fun reportGeneration(generationId: String, reason: String) {
         // generationId is the videoUrl/imageUrl shown; backend logs the real id.
-        val db = com.google.firebase.firestore.ktx.firestore
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         db.collection("reports").add(
             mapOf(
                 "uid" to uid(),

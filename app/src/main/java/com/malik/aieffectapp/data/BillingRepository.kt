@@ -8,13 +8,18 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.queryProductDetails
+import com.android.billingclient.api.queryPurchasesAsync
+import com.android.billingclient.api.consumePurchase
+import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.Firebase
 import com.malik.aieffectapp.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +60,11 @@ class BillingRepository(context: Context) {
 
     private val client: BillingClient = BillingClient.newBuilder(appContext)
         .setListener(purchasesListener)
-        .enablePendingPurchases()
+        .enablePendingPurchases(
+            PendingPurchasesParams.newBuilder()
+                .enableOneTimeProducts()
+                .build()
+        )
         .build()
 
     fun start() {
@@ -118,7 +127,7 @@ class BillingRepository(context: Context) {
 
     private suspend fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) return
-        val uid = com.google.firebase.auth.ktx.auth.currentUser?.uid ?: return
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
         val userRef = Firebase.firestore.collection("users").document(uid)
 
         when {
@@ -145,12 +154,12 @@ class BillingRepository(context: Context) {
 
     /** Re-checks entitlement on every app start (restores, expiry). */
     suspend fun refreshProStatus() {
-        val uid = com.google.firebase.auth.ktx.auth.currentUser?.uid ?: return
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
         return try {
             val params = QueryPurchasesParams.newBuilder()
                 .setProductType(BillingClient.ProductType.SUBS).build()
-            val res = client.queryPurchases(params)
-            val active = (res.purchasesList ?: emptyList()).any {
+            val res = client.queryPurchasesAsync(params)
+            val active = res.purchasesList.any {
                 it.purchaseState == Purchase.PurchaseState.PURCHASED
             }
             Firebase.firestore.collection("users").document(uid)

@@ -20,6 +20,7 @@ import com.malik.aieffectapp.ui.paywall.PaywallScreen
 import com.malik.aieffectapp.ui.result.ResultScreen
 import com.malik.aieffectapp.ui.result.resultRoute
 import com.malik.aieffectapp.ui.theme.AIEffectAppTheme
+import kotlinx.coroutines.launch
 import java.net.URLDecoder
 
 class MainActivity : ComponentActivity() {
