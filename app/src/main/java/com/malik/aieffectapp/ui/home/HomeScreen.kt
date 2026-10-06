@@ -62,6 +62,20 @@ fun HomeScreen(
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
         ) {
+            if (com.malik.aieffectapp.Config.FIREBASE_API_KEY.startsWith("REPLACE_WITH")) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    ),
+                ) {
+                    Text(
+                        "⚠️ Setup pending: Config.kt me Firebase values bharo (HANDOVER.md step 1), phir rebuild karo.",
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+            }
             Text(
                 "Turn photos into viral videos",
                 style = MaterialTheme.typography.headlineSmall,
